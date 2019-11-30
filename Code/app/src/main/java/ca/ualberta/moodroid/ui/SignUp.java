@@ -1,33 +1,96 @@
 package ca.ualberta.moodroid.ui;
 
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.EditText;
+
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.os.Bundle;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
-import com.google.firebase.firestore.auth.User;
+import javax.inject.Inject;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+import ca.ualberta.moodroid.ContextGrabber;
 import ca.ualberta.moodroid.R;
+import ca.ualberta.moodroid.model.UserModel;
 import ca.ualberta.moodroid.service.AuthenticationService;
 import ca.ualberta.moodroid.service.UserService;
-import ca.ualberta.moodroid.service.ValidationService;
 
+/**
+ * This is an initial screen a user will encounter when they are creating a username/account.
+ */
 public class SignUp extends AppCompatActivity {
 
 
-    UserService users;
+    /**
+     * The Auth.
+     */
+    @Inject
     AuthenticationService auth;
-    ValidationService validation;
 
-    public SignUp(UserService userService, AuthenticationService authenticationService, ValidationService validationService) {
-        this.users = userService;
-        this.auth = authenticationService;
-        this.validation = validationService;
+    /**
+     * The Users.
+     */
+    @Inject
+    UserService users;
 
-    }
+    /**
+     * the user object as firebase knows it.
+     */
+    FirebaseUser user;
+
+    /**
+     * A textview that displays the username.
+     */
+    @BindView(R.id.signup_username)
+    EditText usernameField;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
+        ButterKnife.bind(this);
+        ContextGrabber.get().di().inject(SignUp.this);
+        user = FirebaseAuth.getInstance().getCurrentUser();
+
+
+    }
+
+    /**
+     * Register username.
+     *
+     * @param v the v
+     */
+    @OnClick(R.id.register_btn)
+    public void registerUsername(View v) {
+        final String username = usernameField.getText().toString();
+        users.getUserByUsername(username).addOnSuccessListener(new OnSuccessListener<UserModel>() {
+            @Override
+            public void onSuccess(UserModel userModel) {
+                //username already exists
+                if(userModel != null){
+                    usernameField.setError("That username is already taken.");
+                } else {
+                    //create new user
+                    UserModel m = new UserModel();
+                    m.setUsername(username);
+                    users.createNewUser(m, user.getUid()).addOnSuccessListener(new OnSuccessListener<UserModel>() {
+                        @Override
+                        public void onSuccess(UserModel userModel) {
+                            auth.setUsername(username);
+                            finish();
+                            startActivity(new Intent(SignUp.this, MoodHistory.class));
+                        }
+                    });
+                }
+            }
+        });
     }
 }

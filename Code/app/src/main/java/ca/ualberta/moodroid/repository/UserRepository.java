@@ -1,15 +1,25 @@
 package ca.ualberta.moodroid.repository;
 
-import ca.ualberta.moodroid.model.FollowRequestModel;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import ca.ualberta.moodroid.model.UserModel;
 
 /**
  * While user and authentication are two different things, we cannot store custom data in firebase auth, meaning we need to link that into a collection in the
  * firestore
  */
+@Singleton
 public class UserRepository extends BaseRepository {
 
-    protected String collectionName = "users";
-    protected Class modelClass = UserModel.class;
+
+    /**
+     * Instantiates a new User repository.
+     */
+    @Inject
+    public UserRepository() {
+        super("user", UserModel.class);
+
+    }
 
 }

@@ -2,25 +2,48 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="ca.ualberta.moodroid">
 
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
     <application
+        android:name="ca.ualberta.moodroid.ContextGrabber"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ui.Notifications"></activity>
-        <activity android:name=".ui.MoodMap" />
+        <activity android:name=".ui.EditMoodDetail"></activity>
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/map_key" />
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+
+        <uses-library
+            android:name="org.apache.http.legacy"
+            android:required="false" />
+
+        <activity android:name=".ui.Notifications" />
+        <activity android:name=".ui.Map" />
+        <activity android:name=".ui.FriendMap" />
         <activity android:name=".ui.MoodHistory" />
         <activity android:name=".ui.SignUp" />
-        <activity android:name=".ui.Login" />
         <activity android:name=".ui.FriendsMoods" />
+        <activity android:name=".ui.AddLocation" />
+        <activity android:name=".ui.Profile" />
         <activity android:name=".ui.AddMood" />
+        <activity android:name=".ui.AddMoodDetail" />
+        <activity android:name=".ui.ViewMoodDetail" />
         <activity android:name=".ui.AddFriend" />
         <activity
             android:name=".MainActivity"
-            android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

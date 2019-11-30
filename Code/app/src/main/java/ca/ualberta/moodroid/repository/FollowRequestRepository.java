@@ -1,11 +1,28 @@
 package ca.ualberta.moodroid.repository;
 
-import ca.ualberta.moodroid.model.BaseModel;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import ca.ualberta.moodroid.model.FollowRequestModel;
 
+/**
+ * Gets all follow request related documents. See BaseRepository for implementation
+ */
+@Singleton
 public class FollowRequestRepository extends BaseRepository {
 
-    protected String collectionName = "followRequest";
+    /**
+     * The Model class.
+     */
     protected Class modelClass = FollowRequestModel.class;
+
+    /**
+     * Instantiates a new Follow request repository.
+     */
+    @Inject
+    public FollowRequestRepository() {
+
+        super("followRequest", FollowRequestModel.class);
+    }
 
 }

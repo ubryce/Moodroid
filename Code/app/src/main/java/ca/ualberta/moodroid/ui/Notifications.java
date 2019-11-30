@@ -1,25 +1,114 @@
 package ca.ualberta.moodroid.ui;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Bundle;
+import android.util.Log;
 
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.gms.tasks.OnSuccessListener;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
+import javax.inject.Inject;
+
+import butterknife.ButterKnife;
+import ca.ualberta.moodroid.ContextGrabber;
 import ca.ualberta.moodroid.R;
+import ca.ualberta.moodroid.model.FollowRequestModel;
 import ca.ualberta.moodroid.service.UserService;
 
-public class Notifications extends AppCompatActivity {
+/**
+ * This class creates the Notification activity, one of the 4 main activities. There will be
+ * data displayed on this screen via a custom array view if the user has pending requests to
+ * accept or deny.
+ */
+public class Notifications extends BaseUIActivity implements FollowListAdapter.OnListListener {
 
+    /**
+     * The Users.
+     */
+    @Inject
     UserService users;
 
 
-    public Notifications(UserService userService) {
-        this.users = userService;
+    private static final int ACTIVITY_NUM = 0;
+    private RecyclerView moodListRecyclerView;
+    private RecyclerView.Adapter moodListAdapter;
+    private RecyclerView.LayoutManager moodListLayoutManager; //aligns items in list
+    /**
+     * The Request list.
+     */
+    ArrayList<FollowRequestModel> requestList;
 
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notifications);
+        ContextGrabber.get().di().inject(Notifications.this);
+
+        ButterKnife.bind(this);
+        this.setTitle("Notifications");
+        bottomNavigationView(ACTIVITY_NUM);
+
+        requestList = new ArrayList<>();
+
+        users.getAllFollowRequests().addOnSuccessListener(new OnSuccessListener<List<FollowRequestModel>>() {
+            @Override
+            public void onSuccess(List<FollowRequestModel> followRequestModels) {
+                Log.d("NOTIFICATIONS/GET", "Got follow requests: " + followRequestModels.size());
+                if (followRequestModels.size() > 0) {
+                    requestList.addAll(followRequestModels);
+                    updateListView();
+                }
+            }
+        });
+        users.getAllFollowingRequests().addOnSuccessListener(new OnSuccessListener<List<FollowRequestModel>>() {
+            @Override
+            public void onSuccess(List<FollowRequestModel> followRequestModels) {
+                Log.d("NOTIFICATIONS/GET", "Got following requests: " + followRequestModels.size());
+                if (followRequestModels.size() > 0) {
+                    requestList.addAll(followRequestModels);
+                    updateListView();
+                }
+            }
+        });
     }
+
+
+    private void updateListView() {
+
+        Collections.sort(requestList, new Comparator<FollowRequestModel>() {
+            @Override
+            public int compare(FollowRequestModel t1, FollowRequestModel t2) {
+                return t2.dateObject().compareTo(t1.dateObject());
+            }
+        });
+
+        moodListRecyclerView = findViewById(R.id.notification_list_view);
+        moodListRecyclerView.setHasFixedSize(true);
+        moodListLayoutManager = new LinearLayoutManager(Notifications.this);
+        moodListAdapter = new FollowListAdapter(requestList, Notifications.this);
+        moodListRecyclerView.setLayoutManager(moodListLayoutManager);
+        moodListRecyclerView.setAdapter(moodListAdapter);
+    }
+
+    @Override
+    public void onListClick(int position) {
+        return;
+    }
+
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        bottomNavigationView(ACTIVITY_NUM);
+
+    }
+
+
 }

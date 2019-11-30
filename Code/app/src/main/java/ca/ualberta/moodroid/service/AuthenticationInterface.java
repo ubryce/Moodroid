@@ -1,28 +1,35 @@
 package ca.ualberta.moodroid.service;
 
+import android.content.Context;
+
+import com.google.android.gms.tasks.Task;
+
+/**
+ * The interface Authentication interface.
+ * implemented in AuthenticationService
+ */
 public interface AuthenticationInterface {
 
     /**
-     * Login a non-logged in user
+     * Gets username.
      *
-     * @return
+     * @return the username
      */
-    public boolean login();
+    public String getUsername();
 
     /**
-     * Check if the current person is logged in
+     * Sets username.
      *
-     * @return
+     * @param name the name
      */
-    public boolean isLoggedIn();
-
+    public void setUsername(String name);
 
     /**
-     * Check to see if the current user has a profile
+     * Log the user out.
      *
-     * @return
+     * @param context the context
+     * @return task
      */
-    public boolean isNewUser();
-
+    public Task<Void> logOut(Context context);
 
 }

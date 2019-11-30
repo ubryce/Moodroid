@@ -1,55 +1,61 @@
 package ca.ualberta.moodroid.service;
 
+import com.google.android.gms.tasks.Task;
+
 import java.util.List;
 
 import ca.ualberta.moodroid.model.MoodEventModel;
-import ca.ualberta.moodroid.model.MoodModel;
 
 /**
  * We may want to eventually have a filter for geolocation.
+ * implemented in MoodEventService
  */
 public interface MoodEventInterface {
 
     /**
      * Get a list of all your mood events.
      *
-     * @return
+     * @return my events
      */
-    public List<MoodEventModel> getMyEvents();
+    public Task<List<MoodEventModel>> getMyEvents();
 
     /**
      * Get a list of all your mood events filtered by a mood
      *
-     * @param mood
-     * @return
+     * @param moodName the mood name
+     * @return my events
      */
-    public List<MoodEventModel> getMyEvents(MoodModel mood);
+    public Task<List<MoodEventModel>> getMyEvents(String moodName);
 
     /**
-     * Get a list of all the mood events of people you are allowed to follow
+     * Get a single mood event by internal id
      *
-     * @return
+     * @param eventId the internal id
+     * @return the single event
      */
-    public List<MoodEventModel> getAllFollowingEvents();
+    public Task<MoodEventModel> getEventWithId(String eventId);
 
     /**
      * Create a new mood event for the current user
      *
-     * @param moodEvent
+     * @param moodEvent the mood event
+     * @return the task
      */
-    public void createEvent(MoodEventModel moodEvent);
+    public Task<MoodEventModel> createEvent(MoodEventModel moodEvent);
 
     /**
      * Update an existing mood event for the current user
      *
-     * @param moodEvent
+     * @param moodEvent the mood event
+     * @return the task
      */
-    public void updateEvent(MoodEventModel moodEvent);
+    public Task<MoodEventModel> updateEvent(MoodEventModel moodEvent);
 
     /**
      * Delete a mood event for the current user. Be sure this person is allowed to actually delete the mood event.
      *
-     * @param moodEvent
+     * @param moodEvent the mood event
+     * @return the task
      */
-    public void deleteEvent(MoodEventModel moodEvent);
+    public Task<Void> deleteEvent(MoodEventModel moodEvent);
 }

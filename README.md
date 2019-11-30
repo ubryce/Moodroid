@@ -1,3 +1,5 @@
+![CI Status](https://travis-ci.com/CMPUT301F19T15/Moodroid.svg?branch=master)
+
 # Moodroid
 
 An app to log and view other peoples moods. 
@@ -26,9 +28,52 @@ The most important tiers we have are:
 
 This allows the design implementation to only know about how to talk with services and what it expects back (because of interface contracts) so backend and frontend developers can work seemlessly without worrying about breaking on-anothers code.
 
+## Dependency Injection
+
+We use dependency injection in this project so we can easily test our service layer. 
+
+To use services inside Activities/Fragments you need to do the following. Lets say we created a new activity ViewFriends
+
+1. Add your inject(ClassName className) entry into the di/ServiceComponent.java file:
+```java
+    void inject(ViewFriends viewFriends);
+```
+
+2. In your `onCreate()` method, ensure you inject from the DI source:
+```java
+    protected void onCreate(Bundle savedStateBundle) {
+        super.onCreate(savedStateBundle);
+        ContextGrabber.get().di().inject(ViewFriends.this);
+        ...
+        Log.i("DI/TEST", auth.getUsername());
+    }
+```
+
+3. Now above in your properties, you can easily inject dependencies:
+```java
+class ViewFriends extends AppCompatActivity {
+
+    @Inject
+    AuthenticationService auth;
+
+
+    protected void onCreate(Bundle savedStateBundle) {
+        super.onCreate(savedStateBundle);
+        ContextGrabber.get().di().inject(ViewFriends.this);
+        // this will get the auth instance (which is a singleton) and output the username
+        Log.i("DI/TEST", auth.getUsername());
+    }
+
+}
+```
+
+
 ## Terminology
 
 - **mood event**: an entry of a mood by a specific user
 - **model**: a concrete construct of an object in firestore
 - **repository**: an implementation of C(reate)R(ead)U(pdate)D(elete) against some sort of persistent storage, in our case most likely Firestore
 - **service**: a concrete implementation of business logic to be utilized by the controllers/views/fragments/activities in our application
+- **friend follow request**: a user can send a request that is sent to the recipient and they can then decide whether to accept or decline the request
+- **friends mood event**: most recent mood event from friends who the user follows
+- **user**: a person who operates the application
